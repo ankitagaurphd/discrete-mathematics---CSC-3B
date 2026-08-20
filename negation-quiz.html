@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Negation of Compound Statements — Logic Deck</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  :root{
+    --bg:#1E2E45;
+    --card:#28405E;
+    --card-edge:#3A5578;
+    --ink:#F5F8FC;
+    --ink-dim:#AFC1D9;
+    --amber:#F5C766;
+    --coral:#F0766A;
+    --mint:#84D9A8;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(242,193,78,0.06), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(111,207,151,0.05), transparent 45%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+  }
+  .deck{
+    max-width:760px;
+    margin:0 auto;
+    padding:32px 20px 60px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    color:var(--amber);
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  h1.title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(24px,4vw,34px);
+    margin:0 0 4px;
+    line-height:1.15;
+  }
+  .subtitle{
+    color:var(--ink-dim);
+    font-size:14px;
+    margin-bottom:26px;
+  }
+
+  /* progress rail */
+  .rail{
+    display:flex;
+    gap:6px;
+    margin-bottom:28px;
+  }
+  .dot{
+    flex:1;
+    height:5px;
+    border-radius:3px;
+    background:var(--card-edge);
+    position:relative;
+    overflow:hidden;
+  }
+  .dot.done{ background:var(--mint); }
+  .dot.current{ background:var(--amber); }
+
+  .stage{
+    position:relative;
+    flex:1;
+  }
+  .slide{
+    display:none;
+    animation:fadein 0.35s ease;
+  }
+  .slide.active{ display:block; }
+  @keyframes fadein{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  .card{
+    background:linear-gradient(180deg, var(--card), #22374F);
+    border:1px solid var(--card-edge);
+    border-radius:14px;
+    padding:28px 26px;
+  }
+
+  /* Concept slides */
+  .law{
+    font-family:'JetBrains Mono', monospace;
+    font-size:clamp(18px,3vw,22px);
+    background:#1A2C46;
+    border:1px dashed var(--card-edge);
+    border-radius:10px;
+    padding:16px 18px;
+    color:var(--amber);
+    margin:16px 0;
+    letter-spacing:0.02em;
+  }
+  .concept-body p{ line-height:1.65; color:var(--ink); font-size:15px; }
+  .intro-meta{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    color:var(--ink-dim);
+  }
+  .intro-meta .dot-sep{ margin:0 8px; color:var(--amber); }
+  .example{
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid var(--card-edge);
+    font-size:14px;
+    color:var(--ink-dim);
+  }
+  .example + .example{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--card-edge);
+  }
+  .example b{ color:var(--ink); }
+
+  /* Quiz slides */
+  .q-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--ink-dim);
+    margin-bottom:10px;
+  }
+  .q-text{
+    font-family:'Fraunces', serif;
+    font-size:19px;
+    font-weight:600;
+    line-height:1.4;
+    margin-bottom:18px;
+  }
+  .q-formula{
+    color:var(--amber);
+    font-family:'JetBrains Mono', monospace;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .opt{
+    text-align:left;
+    background:#1A2C46;
+    border:1px solid var(--card-edge);
+    color:var(--ink);
+    padding:13px 16px;
+    border-radius:9px;
+    font-size:14.5px;
+    font-family:'JetBrains Mono', monospace;
+    cursor:pointer;
+    transition:border-color .15s, transform .1s, background .15s;
+  }
+  .opt:hover{ border-color:var(--amber); }
+  .opt:active{ transform:scale(0.99); }
+  .opt.correct{
+    border-color:var(--mint);
+    background:rgba(111,207,151,0.12);
+    color:var(--mint);
+  }
+  .opt.wrong{
+    border-color:var(--coral);
+    background:rgba(232,96,76,0.12);
+    color:var(--coral);
+  }
+  .opt.disabled{ pointer-events:none; opacity:0.55; }
+
+  .hint{
+    display:none;
+    margin-top:14px;
+    padding:12px 14px;
+    background:rgba(242,193,78,0.08);
+    border-left:3px solid var(--amber);
+    border-radius:6px;
+    font-size:13.5px;
+    color:var(--ink);
+    line-height:1.5;
+  }
+  .hint.show{ display:block; }
+  .feedback{
+    margin-top:14px;
+    font-size:13.5px;
+    font-weight:500;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.ok{ color:var(--mint); }
+
+  /* Nav */
+  .nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:24px;
+  }
+  .btn{
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    font-weight:600;
+    padding:10px 18px;
+    border-radius:8px;
+    border:1px solid var(--card-edge);
+    background:transparent;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .btn:hover{ border-color:var(--amber); }
+  .btn.primary{
+    background:var(--amber);
+    color:#20180A;
+    border-color:var(--amber);
+  }
+  .btn.primary:hover{ opacity:0.9; }
+  .btn:disabled{ opacity:0.3; cursor:not-allowed; }
+  .btn:disabled:hover{ border-color:var(--card-edge); }
+
+  .counter{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--ink-dim);
+  }
+
+  /* Score / final slide */
+  .score-wrap{ text-align:center; padding:30px 10px; }
+  .score-num{
+    font-family:'Fraunces', serif;
+    font-size:56px;
+    color:var(--amber);
+    font-weight:700;
+  }
+  .score-label{ color:var(--ink-dim); font-size:14px; margin-top:4px; }
+  .restart{ margin-top:22px; }
+
+  @media (max-width:480px){
+    .card{ padding:20px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+  <h1 class="title">Negation of Compound Statements</h1>
+  <div class="subtitle">A short walkthrough, then 10 questions to test it. Wrong answers reveal a hint — try again.</div>
+
+  <div class="rail" id="rail"></div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="nav">
+    <button class="btn" id="prevBtn">← Back</button>
+    <span class="counter" id="counter"></span>
+    <button class="btn primary" id="nextBtn">Next →</button>
+  </div>
+</div>
+
+<script>
+const CONCEPTS = [
+  {
+    type:'concept',
+    tag:'Rule 1',
+    title:'Negation of a Conjunction',
+    law:'~(p ∧ q) ≡ ~p ∨ ~q',
+    body:`<p>Negating an "and" statement flips it into an "or" of the negated parts. To deny that both things are true, it's enough that <em>at least one</em> fails.</p>`,
+    examples:[
+      `<b>Example:</b> "Paris is in France and London is in England" negates to<br>"Paris is not in France or London is not in England."`,
+      `<b>Example:</b> "2 + 4 = 6 and 7 &lt; 12" negates to<br>"2 + 4 ≠ 6 or 7 ⋠ 12."`,
+      `<b>Example:</b> "The lamp is on and the door is locked" negates to<br>"The lamp is not on or the door is not locked."`
+    ]
+  },
+  {
+    type:'concept',
+    tag:'Rule 2',
+    title:'Negation of a Disjunction',
+    law:'~(p ∨ q) ≡ ~p ∧ ~q',
+    body:`<p>Negating an "or" statement flips it into an "and" of the negated parts. To deny that at least one is true, <em>both</em> must fail.</p>`,
+    examples:[
+      `<b>Example:</b> "Ram is in Class XI or Arun is in Class XII" negates to<br>"Ram is not in Class XI and Arun is not in Class XII."`,
+      `<b>Example:</b> "9 is greater than 4 or 6 is less than 8" negates to<br>"9 is not greater than 4 and 6 is not less than 8."`,
+      `<b>Example:</b> "It is Saturday or it is Sunday" negates to<br>"It is not Saturday and it is not Sunday."`
+    ]
+  },
+  {
+    type:'concept',
+    tag:'Rule 3',
+    title:'Negation of a Negation',
+    law:'~(~p) ≡ p',
+    body:`<p>Two negations cancel out — denying a denial returns the original statement.</p>`,
+    examples:[
+      `<b>Example:</b> ~p: "Roses are not red" → ~(~p): "It is false that roses are not red" ≡ "Roses are red."`,
+      `<b>Example:</b> p: "The sky is blue" → ~p: "The sky is not blue" → ~(~p): "It is not the case that the sky is not blue" ≡ "The sky is blue."`,
+      `<b>Example:</b> p: "5 is a prime number" → ~(~p) simplifies straight back to "5 is a prime number."`
+    ]
+  },
+  {
+    type:'concept',
+    tag:'Rule 4',
+    title:'Negation of a Conditional',
+    law:'~(p → q) ≡ p ∧ ~q',
+    body:`<p>An "if p then q" statement only fails when p happens but q doesn't. So its negation asserts p is true <em>and</em> q is false.</p>`,
+    examples:[
+      `<b>Example:</b> "If it is raining, the game is cancelled" negates to<br>"It is raining and the game is not cancelled."`,
+      `<b>Example:</b> "If he studies, he will pass the examination" negates to<br>"He studies and he will not pass the examination."`,
+      `<b>Example:</b> "If the battery is charged, the phone turns on" negates to<br>"The battery is charged and the phone does not turn on."`
+    ]
+  },
+  {
+    type:'concept',
+    tag:'Rule 5',
+    title:'Negation of a Biconditional',
+    law:'~(p ↔ q) ≡ (p ↔ ~q) ≡ (~p ↔ q)',
+    body:`<p>An "if and only if" statement holds when p and q match. Its negation says they <em>don't</em> match — p paired with not-q, or not-p paired with q.</p>`,
+    examples:[
+      `<b>Example:</b> "He swims iff the water is warm" negates to<br>"He swims iff the water is not warm."`,
+      `<b>Example:</b> "This program is correct iff it produces the correct answer for all input data" negates to<br>"This program is correct iff it does not produce the correct answer for all input data."`,
+      `<b>Example:</b> "A triangle is equilateral iff all its sides are equal" negates to<br>"A triangle is equilateral iff not all its sides are equal."`
+    ]
+  }
+];
+
+const QUIZ = [
+  {
+    q:`<span class="q-formula">~(p ∧ q)</span> is logically equivalent to:`,
+    options:['~p ∧ ~q','~p ∨ ~q','p ∨ q','p ∧ q'],
+    answer:1,
+    hint:'Negating "and" turns it into "or" — that\'s De Morgan\'s law for conjunction: ~(p ∧ q) ≡ ~p ∨ ~q.'
+  },
+  {
+    q:`<span class="q-formula">~(p ∨ q)</span> is logically equivalent to:`,
+    options:['~p ∧ ~q','~p ∨ ~q','p ∧ ~q','~p ∨ q'],
+    answer:0,
+    hint:'Negating "or" turns it into "and" — ~(p ∨ q) ≡ ~p ∧ ~q. Both parts must fail.'
+  },
+  {
+    q:`What is <span class="q-formula">~(~p)</span> equivalent to?`,
+    options:['~p','True, always','p','False, always'],
+    answer:2,
+    hint:'A double negation cancels itself out. Negating "not p" gives you back p.'
+  },
+  {
+    q:`The negation of <span class="q-formula">p → q</span> is:`,
+    options:['~p → ~q','p ∧ ~q','~p ∧ q','~p ∨ q'],
+    answer:1,
+    hint:'A conditional only fails when p is true but q is false. So ~(p → q) ≡ p ∧ ~q.'
+  },
+  {
+    q:`Which is a correct negation of "He swims if and only if the water is warm"?`,
+    options:[
+      'He swims and the water is warm',
+      'He swims if and only if the water is not warm',
+      'If he swims, the water is warm',
+      'He does not swim or the water is not warm'
+    ],
+    answer:1,
+    hint:'For a biconditional, negate one side only: ~(p ↔ q) ≡ p ↔ ~q. Keep the "if and only if" structure, just flip one part.'
+  },
+  {
+    q:`Negate: "Paris is in France and London is in England."`,
+    options:[
+      'Paris is not in France and London is not in England.',
+      'Paris is in France or London is in England.',
+      'Paris is not in France or London is not in England.',
+      'Neither Paris is in France nor London is in England.'
+    ],
+    answer:2,
+    hint:'This is a conjunction (p ∧ q). Its negation is ~p ∨ ~q — "or", not "and".'
+  },
+  {
+    q:`Negate: "Ram is in Class XI or Arun is in Class XII."`,
+    options:[
+      'Ram is not in Class XI or Arun is not in Class XII.',
+      'Ram is not in Class XI and Arun is not in Class XII.',
+      'Ram is in Class XI and Arun is in Class XII.',
+      'Either Ram or Arun is not in class.'
+    ],
+    answer:1,
+    hint:'This is a disjunction (p ∨ q). Its negation is ~p ∧ ~q — "and", not "or".'
+  },
+  {
+    q:`Negate: "If it is raining, then the game is cancelled."`,
+    options:[
+      'It is not raining and the game is cancelled.',
+      'If it is not raining, the game is not cancelled.',
+      'It is raining and the game is not cancelled.',
+      'The game is cancelled and it is not raining.'
+    ],
+    answer:2,
+    hint:'Use ~(p → q) ≡ p ∧ ~q: keep p ("it is raining") true, and negate q ("cancelled" → "not cancelled").'
+  },
+  {
+    q:`For p = T and q = F, what is the truth value of <span class="q-formula">~(p ∧ q)</span>?`,
+    options:['True','False','Cannot be determined','Undefined'],
+    answer:0,
+    hint:'First evaluate p ∧ q: T ∧ F = F. Then negate it: ~F = T.'
+  },
+  {
+    q:`Which expression correctly represents <span class="q-formula">~(p ↔ q)</span>?`,
+    options:[
+      '~p ↔ ~q',
+      '(p ∧ ~q) ∨ (q ∧ ~p)',
+      'p ∧ q',
+      '~p ∨ ~q'
+    ],
+    answer:1,
+    hint:'A biconditional fails when p and q disagree — one true, the other false. That\'s (p ∧ ~q) ∨ (q ∧ ~p).'
+  }
+];
+
+const slides = [
+  {type:'intro'},
+  ...CONCEPTS,
+  ...QUIZ.map((q,i)=>({type:'quiz', data:q, index:i})),
+  {type:'final'}
+];
+
+let current = 0;
+let score = 0;
+const answered = new Array(QUIZ.length).fill(false);
+
+const stage = document.getElementById('stage');
+const rail = document.getElementById('rail');
+const counter = document.getElementById('counter');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function buildRail(){
+  rail.innerHTML = '';
+  slides.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'dot';
+    rail.appendChild(d);
+  });
+}
+
+function renderRail(){
+  const dots = rail.children;
+  for(let i=0;i<dots.length;i++){
+    dots[i].className = 'dot' + (i<current?' done':i===current?' current':'');
+  }
+}
+
+function renderSlide(){
+  const s = slides[current];
+  let html = '';
+
+  if(s.type === 'intro'){
+    html = `
+      <div class="card">
+        <div class="eyebrow">Manav Rachana University</div>
+        <h1 class="title" style="margin-top:6px;">Five rules, ten checks.</h1>
+        <div class="intro-meta">
+          <span>Discrete Mathematics</span>
+          <span class="dot-sep">·</span>
+          <span>Dr. Ankita Gaur</span>
+        </div>
+      </div>`;
+  }
+  else if(s.type === 'concept'){
+    html = `
+      <div class="card">
+        <div class="eyebrow">${s.tag}</div>
+        <h1 class="title">${s.title}</h1>
+        <div class="law">${s.law}</div>
+        <div class="concept-body">${s.body}</div>
+        ${s.examples.map(ex=>`<div class="example">${ex}</div>`).join('')}
+      </div>`;
+  }
+  else if(s.type === 'quiz'){
+    const q = s.data;
+    const idx = s.index;
+    html = `
+      <div class="card">
+        <div class="q-tag">Question ${idx+1} of ${QUIZ.length}</div>
+        <div class="q-text">${q.q}</div>
+        <div class="options" id="opts">
+          ${q.options.map((opt,i)=>`<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}.  ${opt}</button>`).join('')}
+        </div>
+        <div class="feedback" id="fb"></div>
+        <div class="hint" id="hint">💡 ${q.hint}</div>
+      </div>`;
+  }
+  else if(s.type === 'final'){
+    html = `
+      <div class="card score-wrap">
+        <div class="eyebrow">Deck complete</div>
+        <div class="score-num">${score} / ${QUIZ.length}</div>
+        <div class="score-label">correct on first attempt</div>
+        <div class="restart">
+          <button class="btn primary" id="restartBtn">Restart deck ↺</button>
+        </div>
+      </div>`;
+  }
+
+  stage.innerHTML = html;
+
+  if(s.type === 'quiz'){
+    wireQuiz(s);
+  }
+  if(s.type === 'final'){
+    document.getElementById('restartBtn').addEventListener('click', ()=>{
+      current = 0;
+      score = 0;
+      answered.fill(false);
+      update();
+    });
+  }
+}
+
+function wireQuiz(s){
+  const q = s.data;
+  const idx = s.index;
+  const opts = document.querySelectorAll('#opts .opt');
+  const hint = document.getElementById('hint');
+  const fb = document.getElementById('fb');
+
+  if(answered[idx]){
+    // already answered correctly previously — lock in correct state
+    opts.forEach((btn,i)=>{
+      btn.classList.add('disabled');
+      if(i===q.answer) btn.classList.add('correct');
+    });
+    fb.textContent = '✓ Correct — locked in.';
+    fb.className = 'feedback show ok';
+  }
+
+  opts.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const chosen = parseInt(btn.dataset.i);
+      if(chosen === q.answer){
+        opts.forEach(b=>b.classList.add('disabled'));
+        btn.classList.add('correct');
+        fb.textContent = '✓ Correct!';
+        fb.className = 'feedback show ok';
+        hint.classList.remove('show');
+        if(!answered[idx]){
+          score++;
+          answered[idx] = true;
+        }
+      } else {
+        btn.classList.add('wrong');
+        btn.classList.add('disabled');
+        hint.classList.add('show');
+        fb.textContent = 'Not quite — see the hint below and try another option.';
+        fb.className = 'feedback show';
+      }
+    });
+  });
+}
+
+function update(){
+  renderRail();
+  renderSlide();
+  counter.textContent = `${current+1} / ${slides.length}`;
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === slides.length - 1;
+  nextBtn.textContent = current === slides.length - 2 ? 'Finish →' : 'Next →';
+}
+
+prevBtn.addEventListener('click', ()=>{
+  if(current>0){ current--; update(); }
+});
+nextBtn.addEventListener('click', ()=>{
+  if(current<slides.length-1){ current++; update(); }
+});
+
+buildRail();
+update();
+</script>
+
+<style>#dm-home{position:fixed;right:14px;bottom:14px;z-index:99999;background:#5b4bdb;color:#fff;padding:10px 13px;border-radius:12px;font:800 12px Arial,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.18);text-decoration:none}#dm-home:hover{transform:translateY(-1px)}</style><a id="dm-home" href="index.html">🏠 Portal Home</a><script>(function(){try{let k='dmPortalV5',s=JSON.parse(localStorage.getItem(k)||'{}');s['negation']=true;localStorage.setItem(k,JSON.stringify(s))}catch(e){}})();</script></body>
+</html>
