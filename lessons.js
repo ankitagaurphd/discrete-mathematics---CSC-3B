@@ -46,6 +46,36 @@ window.DM_LESSONS = [
     search: "negation compound statements de morgan conditional biconditional"
   },
   {
+    id: "d30-hasse",
+    title: "D₃₀ Hasse Diagram Explorer",
+    category: "posets",
+    type: "Interactive Lesson",
+    description: "Step-by-step animated guide to building and understanding Hasse diagrams using the divisibility relation on D₃₀.",
+    icon: "🧩",
+    file: "d30-hasse.html",
+    search: "d30 hasse diagram divisibility partial order poset cover relations incomparable levels"
+  },
+  {
+    id: "special-elements-posets",
+    title: "Special Elements in Posets",
+    category: "posets",
+    type: "Interactive Lesson",
+    description: "Animated slide deck detailing maximal, minimal, least, and greatest elements in partially ordered sets.",
+    icon: "⭐",
+    file: "special-elements-posets.html",
+    search: "posets lattices special elements maximal minimal least greatest hasse diagrams"
+  },
+  {
+    id: "posets-hasse-lecture",
+    title: "Partial Order Sets & Hasse Diagrams",
+    category: "posets",
+    type: "Interactive Lesson",
+    description: "Comprehensive lecture presentation covering partial order properties, power-set Hasse construction, and solved examples.",
+    icon: "📐",
+    file: "posets-hasse-lecture.html",
+    search: "partial order sets posets hasse diagrams power set reflexivity transitivity antisymmetry"
+  },
+  {
     id: "logicquiz",
     title: "Propositional Logic Quiz",
     category: "quiz",
