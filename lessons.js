@@ -1,19 +1,3 @@
-/*
-  DISCRETE MATHEMATICS PORTAL — LESSON REGISTRY
-  ------------------------------------------------
-  To add a new lesson:
-  1. Upload the new .html file into this same folder.
-  2. Copy one lesson object below.
-  3. Change id, title, category, type, description, icon, file, and search.
-  4. Commit the changes to GitHub.
-  GitHub Pages will update the same website URL automatically.
-
-  category must be one of:
-  "logic", "relations", "sets", "functions", "posets", "lattices", "quiz", "other"
-
-  type examples:
-  "Interactive Lesson", "Lesson + Quiz", "Quiz", "Practice"
-*/
 window.DM_LESSONS = [
   {
     id: "logic",
@@ -52,7 +36,7 @@ window.DM_LESSONS = [
     type: "Interactive Lesson",
     description: "Step-by-step animated guide to building and understanding Hasse diagrams using the divisibility relation on D₃₀.",
     icon: "🧩",
-    file: "d30-hasse.html",
+    file: "D30_Hasse_Diagram_Interactive.html",
     search: "d30 hasse diagram divisibility partial order poset cover relations incomparable levels"
   },
   {
@@ -62,7 +46,7 @@ window.DM_LESSONS = [
     type: "Interactive Lesson",
     description: "Animated slide deck detailing maximal, minimal, least, and greatest elements in partially ordered sets.",
     icon: "⭐",
-    file: "special-elements-posets.html",
+    file: "poset_special_elements.html",
     search: "posets lattices special elements maximal minimal least greatest hasse diagrams"
   },
   {
@@ -72,8 +56,28 @@ window.DM_LESSONS = [
     type: "Interactive Lesson",
     description: "Comprehensive lecture presentation covering partial order properties, power-set Hasse construction, and solved examples.",
     icon: "📐",
-    file: "posets-hasse-lecture.html",
+    file: "Posets-and-Hasse-Diagrams.html",
     search: "partial order sets posets hasse diagrams power set reflexivity transitivity antisymmetry"
+  },
+  {
+    id: "conditional-slides",
+    title: "Conditional Statement Interactive Slides",
+    category: "logic",
+    type: "Interactive Lesson",
+    description: "Interactive deck on conditional statements and logical implications.",
+    icon: "📄",
+    file: "Conditional_Statement_Interactive_Slides.html",
+    search: "conditional statement slides interactive logic"
+  },
+  {
+    id: "quantifiers",
+    title: "Quantifiers Lesson",
+    category: "logic",
+    type: "Interactive Lesson",
+    description: "Understanding universal and existential quantifiers in discrete mathematics.",
+    icon: "∀",
+    file: "quantifiers (1) (1).html",
+    search: "quantifiers predicate logic universal existential"
   },
   {
     id: "logicquiz",
