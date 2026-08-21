@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D30 Hasse Diagram — Step-by-Step Explorer</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --card:#fff; --ink:#172033; --muted:#667085;
+    --accent:#635bff; --accent2:#00a896; --warn:#ff9f1c; --danger:#e63946;
+    --line:#b8c1d1; --soft:#eef1ff; --shadow:0 12px 35px rgba(23,32,51,.10);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#f8f9ff,#eef8f6);color:var(--ink)}
+  header{padding:34px 20px 25px;text-align:center;background:linear-gradient(120deg,#4338ca,#7c3aed,#0891b2);color:white}
+  header h1{margin:0 0 8px;font-size:clamp(28px,5vw,48px)}
+  header p{margin:0;opacity:.92;font-size:16px}
+  .wrap{max-width:1180px;margin:auto;padding:24px 18px 50px}
+  .card{background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:22px;margin:18px 0}
+  .step{display:none}.step.active{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  h2{margin-top:0;color:#312e81} h3{margin-bottom:8px}
+  .progress{height:10px;background:#e8eaf2;border-radius:20px;overflow:hidden;margin:10px 0 18px}
+  .bar{height:100%;width:16.6%;background:linear-gradient(90deg,var(--accent),#06b6d4);transition:.3s}
+  .controls{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+  button{border:0;border-radius:12px;padding:11px 17px;font-weight:700;cursor:pointer;background:#e8eaff;color:#312e81}
+  button.primary{background:var(--accent);color:white} button:disabled{opacity:.4;cursor:not-allowed}
+  .pill{display:inline-block;padding:7px 10px;border-radius:999px;background:var(--soft);color:#3730a3;font-weight:700;margin:3px}
+  .math{font-family:Georgia,serif;font-size:22px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .mini{padding:16px;border:1px solid #e5e7eb;border-radius:15px;background:#fbfcff}
+  .good{border-left:5px solid var(--accent2)} .why{border-left:5px solid var(--warn)}
+  .bad{border-left:5px solid var(--danger)}
+  .table{width:100%;border-collapse:collapse;margin-top:12px}
+  .table th,.table td{padding:10px;border-bottom:1px solid #e8eaf0;text-align:left}
+  .table th{background:#f7f8fc}
+  .diagram-wrap{overflow:auto;border:1px solid #e5e7eb;border-radius:18px;background:#fbfcff}
+  svg{display:block;min-width:760px;width:100%;height:620px}
+  .node{transition:.2s;cursor:pointer}.node circle{fill:white;stroke:#4338ca;stroke-width:3}
+  .node text{font-weight:800;fill:#172033;text-anchor:middle;dominant-baseline:middle}
+  .node:hover circle{fill:#eef1ff;stroke:#06b6d4}
+  .edge{stroke:var(--line);stroke-width:2.5}
+  .level-label{font-size:14px;fill:#7c8497;font-weight:700}
+  .highlight circle{fill:#fff7e6;stroke:#ff9f1c}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin-top:10px}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;vertical-align:-1px;margin-right:5px}
+  .quiz{padding:18px;background:#f8f7ff;border-radius:15px}
+  .answer{display:none;margin-top:10px;padding:12px;border-radius:12px;background:#ecfdf5;color:#065f46}
+  .answer.show{display:block}
+  .small{color:var(--muted);font-size:14px}
+  code{background:#f1f3f8;padding:2px 5px;border-radius:5px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧩 D₃₀ Hasse Diagram Explorer</h1>
+  <p>Build the diagram from the divisibility relation — one idea at a time.</p>
+</header>
+
+<div class="wrap">
+  <div class="card">
+    <div><strong id="stepTitle">Step 1 of 6</strong></div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="controls">
+      <button id="prev" onclick="move(-1)">← Previous</button>
+      <span class="small" id="hint">Start with the elements.</span>
+      <button class="primary" id="next" onclick="move(1)">Next →</button>
+    </div>
+  </div>
+
+  <section class="card step active" id="s1">
+    <h2>1. What is D₃₀?</h2>
+    <p>Let <span class="math">D₃₀</span> be the set of <strong>positive divisors of 30</strong>, ordered by divisibility.</p>
+    <div class="grid">
+      <div class="mini good"><h3>Elements</h3><p class="math">{1, 2, 3, 5, 6, 10, 15, 30}</p></div>
+      <div class="mini why"><h3>Order rule</h3><p class="math">a ≤ b ⇔ a | b</p><p>So “lower” means “divides”.</p></div>
+    </div>
+    <h3>How do we find them?</h3>
+    <p>Since <span class="math">30 = 2 × 3 × 5</span>, every divisor chooses whether to contain each prime factor:</p>
+    <p>
+      <span class="pill">1</span><span class="pill">2</span><span class="pill">3</span><span class="pill">5</span>
+      <span class="pill">6 = 2×3</span><span class="pill">10 = 2×5</span><span class="pill">15 = 3×5</span><span class="pill">30 = 2×3×5</span>
+    </p>
+  </section>
+
+  <section class="card step" id="s2">
+    <h2>2. Comparable vs. non-comparable</h2>
+    <p>Two elements are <strong>comparable</strong> if one divides the other. Otherwise they are <strong>non-comparable (incomparable)</strong>.</p>
+    <div class="grid">
+      <div class="mini good">
+        <h3>✅ Comparable</h3>
+        <p><span class="math">2 | 6</span>, so 2 and 6 are comparable.</p>
+        <p><span class="math">5 | 30</span>, so 5 and 30 are comparable.</p>
+      </div>
+      <div class="mini bad">
+        <h3>❌ Non-comparable</h3>
+        <p><span class="math">2 ∤ 3</span> and <span class="math">3 ∤ 2</span>.</p>
+        <p>Therefore 2 and 3 are incomparable.</p>
+      </div>
+    </div>
+    <h3>Important incomparable pairs in D₃₀</h3>
+    <p>
+      <span class="pill">2 ↔ 3</span><span class="pill">2 ↔ 5</span><span class="pill">3 ↔ 5</span>
+      <span class="pill">6 ↔ 10</span><span class="pill">6 ↔ 15</span><span class="pill">10 ↔ 15</span>
+    </p>
+    <p class="small">There are other incomparable pairs too, such as 3 with 10 and 5 with 6. The key test is always: “Does either number divide the other?”</p>
+  </section>
+
+  <section class="card step" id="s3">
+    <h2>3. Why do incomparable elements appear on different-looking branches?</h2>
+    <p>A Hasse diagram does <strong>not</strong> place elements according to their numerical size. It places them according to the partial order.</p>
+    <div class="mini why">
+      <h3>Example: 6 and 10</h3>
+      <p><span class="math">6 = 2×3</span> and <span class="math">10 = 2×5</span>.</p>
+      <p>Neither divides the other, so there is <strong>no order relation</strong> between them. They therefore occupy separate branches at the same level.</p>
+    </div>
+    <div class="grid">
+      <div class="mini">
+        <h3>Level idea</h3>
+        <p><strong>Level 0:</strong> elements with nothing below them → 1</p>
+        <p><strong>Level 1:</strong> 2, 3, 5</p>
+        <p><strong>Level 2:</strong> 6, 10, 15</p>
+        <p><strong>Level 3:</strong> 30</p>
+      </div>
+      <div class="mini good">
+        <h3>Why same level?</h3>
+        <p>6, 10 and 15 each contain exactly two of the three prime factors 2, 3, 5. None divides another.</p>
+        <p>So they naturally form the same “layer” in the standard graded drawing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card step" id="s4">
+    <h2>4. Remove transitive connections</h2>
+    <p>This is the trick that makes a Hasse diagram clean.</p>
+    <div class="grid">
+      <div class="mini">
+        <h3>Ordinary divisibility graph</h3>
+        <p>It could show every relation, including <span class="math">1|6</span>, <span class="math">1|30</span>, and <span class="math">2|30</span>.</p>
+        <p>That becomes cluttered.</p>
+      </div>
+      <div class="mini good">
+        <h3>Hasse rule</h3>
+        <p>Keep only <strong>cover relations</strong>: connect <span class="math">a</span> to <span class="math">b</span> when <span class="math">a|b</span> and there is no divisor strictly between them.</p>
+      </div>
+    </div>
+    <h3>Cover relations for D₃₀</h3>
+    <p>
+      <span class="pill">1–2</span><span class="pill">1–3</span><span class="pill">1–5</span>
+      <span class="pill">2–6</span><span class="pill">2–10</span>
+      <span class="pill">3–6</span><span class="pill">3–15</span>
+      <span class="pill">5–10</span><span class="pill">5–15</span>
+      <span class="pill">6–30</span><span class="pill">10–30</span><span class="pill">15–30</span>
+    </p>
+    <div class="mini why"><strong>Notice:</strong> there is no direct line from 1 to 6, because 1 → 2 → 6 or 1 → 3 → 6 already tells us 1 divides 6.</div>
+  </section>
+
+  <section class="card step" id="s5">
+    <h2>5. Watch the Hasse diagram being constructed</h2>
+    <p>Instead of showing the finished diagram immediately, watch it <strong>grow from the bottom upward</strong>. Each new element appears only after the relations needed to place it are established.</p>
+
+    <div class="diagram-wrap">
+      <svg id="buildDiagram" viewBox="0 0 900 620" aria-label="Animated construction of the D30 Hasse diagram">
+        <g id="buildEdges"></g>
+        <g>
+          <text class="level-label" x="30" y="95">Level 3</text>
+          <text class="level-label" x="30" y="255">Level 2</text>
+          <text class="level-label" x="30" y="405">Level 1</text>
+          <text class="level-label" x="30" y="545">Level 0</text>
+        </g>
+        <g id="buildNodes"></g>
+      </svg>
+    </div>
+
+    <div class="controls" style="margin-top:14px">
+      <button onclick="restartBuild()">↺ Restart</button>
+      <button class="primary" onclick="animateNext()">Build next →</button>
+      <button onclick="autoBuild()">▶ Auto build</button>
+    </div>
+
+    <div class="mini why" style="margin-top:14px">
+      <strong id="buildCaption">Start: place 1 at the bottom because 1 divides every element of D₃₀.</strong>
+    </div>
+
+    <div class="grid" style="margin-top:14px">
+      <div class="mini">
+        <h3>Why this movement?</h3>
+        <p>The construction follows the partial order: smaller divisors are placed below their multiples.</p>
+      </div>
+      <div class="mini good">
+        <h3>Watch for this</h3>
+        <p>When 2, 3 and 5 appear, they do <strong>not</strong> get joined to one another because they are incomparable.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card step" id="s6">
+    <h2>6. Final Hasse diagram — build it step by step</h2>
+    <p>Now watch the <strong>complete Hasse diagram construct itself</strong>. Every node and every cover line is added in the correct order.</p>
+
+    <div class="diagram-wrap">
+      <svg id="finalBuildDiagram" viewBox="0 0 900 620" aria-label="Stepwise animated D30 Hasse diagram">
+        <g id="finalEdges"></g>
+        <g>
+          <text class="level-label" x="30" y="95">Level 3</text>
+          <text class="level-label" x="30" y="255">Level 2</text>
+          <text class="level-label" x="30" y="405">Level 1</text>
+          <text class="level-label" x="30" y="545">Level 0</text>
+        </g>
+        <g id="finalNodes"></g>
+      </svg>
+    </div>
+
+    <div class="controls" style="margin-top:14px">
+      <button onclick="finalRestart()">↺ Restart</button>
+      <button class="primary" onclick="finalNext()">Next construction step →</button>
+      <button onclick="finalAuto()">▶ Play automatically</button>
+    </div>
+
+    <div class="mini why" style="margin-top:14px">
+      <strong id="finalCaption">Step 0: Begin with the empty diagram.</strong>
+    </div>
+
+    <div class="grid" style="margin-top:14px">
+      <div class="mini">
+        <h3>Construction order</h3>
+        <p>1 → 2,3,5 → 6,10,15 → 30</p>
+      </div>
+      <div class="mini good">
+        <h3>Center</h3>
+        <p><strong>10 is centered</strong> in the middle level to make the diagram balanced and easy to follow.</p>
+      </div>
+      <div class="mini bad">
+        <h3>No extra lines</h3>
+        <p>Only cover relations are drawn. Incomparable elements stay disconnected.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="card">
+    <h3>One-line summary</h3>
+    <p class="math">D₃₀ = {1,2,3,5,6,10,15,30}, ordered by divisibility; keep only cover relations, arrange comparable chains upward, and leave incomparable elements without connecting lines.</p>
+  </div>
+</div>
+
+<script>
+let current=1, total=6;
+const titles=[
+  "Step 1: The elements of D₃₀",
+  "Step 2: Comparable and non-comparable elements",
+  "Step 3: Why the levels look this way",
+  "Step 4: Keep only cover relations",
+  "Step 5: Build the diagram interactively",
+  "Step 6: Complete Hasse diagram"
+];
+const hints=[
+  "Start with the elements.",
+  "Test divisibility in both directions.",
+  "Levels represent the partial order, not ordinary size.",
+  "Remove transitive edges.",
+  "Click nodes to explore.",
+  "You have built the complete diagram."
+];
+function render(){
+  if(current===5 && buildIndex===0) restartBuild();
+  if(current===6 && finalIndex===0) finalRestart();
+  for(let i=1;i<=total;i++) document.getElementById("s"+i).classList.toggle("active",i===current);
+  document.getElementById("stepTitle").textContent=`Step ${current} of ${total}`;
+  document.getElementById("bar").style.width=(current/total*100)+"%";
+  document.getElementById("hint").textContent=hints[current-1];
+  document.getElementById("prev").disabled=current===1;
+  document.getElementById("next").disabled=current===total;
+  document.getElementById("next").textContent=current===total?"Done ✓":"Next →";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function move(d){current=Math.max(1,Math.min(total,current+d));render();}
+const neighbors={
+  1:[2,3,5],2:[1,6,10],3:[1,6,15],5:[1,10,15],
+  6:[2,3,30],10:[2,5,30],15:[3,5,30],30:[6,10,15]
+};
+function focusNode(n){
+  document.querySelectorAll("#diagram .node").forEach(x=>x.classList.remove("highlight"));
+  const node=document.querySelector(`#diagram .node[data-n="${n}"]`);
+  if(node) node.classList.add("highlight");
+  document.querySelectorAll("#diagram .node").forEach(x=>{
+    const k=Number(x.dataset.n);
+    if(neighbors[n].includes(k)) x.classList.add("highlight");
+  });
+  document.getElementById("focusText").innerHTML=
+    `<strong>${n}</strong> is immediately connected to: <strong>${neighbors[n].join(", ")}</strong>.<br>
+     These are its cover-neighbors in the Hasse diagram.`;
+}
+
+const buildPositions = {
+  1:[450,540], 2:[225,400], 3:[450,400], 5:[675,400],
+  6:[225,250], 10:[450,250], 15:[675,250], 30:[450,90]
+};
+const buildOrder = [1,2,3,5,6,10,15,30];
+const buildEdges = [
+  [1,2],[1,3],[1,5],
+  [2,6],[2,10],[3,6],[3,15],[5,10],[5,15],
+  [6,30],[10,30],[15,30]
+];
+let buildIndex = 0, autoTimer = null;
+
+function makeBuildNode(n){
+  const [x,y]=buildPositions[n];
+  const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+  g.setAttribute("class","node");
+  g.setAttribute("data-n",n);
+  g.setAttribute("transform",`translate(${x},${y}) scale(.15)`);
+  g.style.transition="transform .65s cubic-bezier(.2,.9,.25,1), opacity .65s";
+  g.style.opacity="0";
+  const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  c.setAttribute("r", n===30?29:27);
+  const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+  t.textContent=n;
+  g.appendChild(c); g.appendChild(t);
+  document.getElementById("buildNodes").appendChild(g);
+  requestAnimationFrame(()=>{g.style.opacity="1";g.setAttribute("transform",`translate(${x},${y}) scale(1)`);});
+}
+
+function makeBuildEdge(a,b){
+  const [x1,y1]=buildPositions[a], [x2,y2]=buildPositions[b];
+  const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+  l.setAttribute("class","edge");
+  l.setAttribute("x1",x1);l.setAttribute("y1",y1);l.setAttribute("x2",x1);l.setAttribute("y2",y1);
+  l.style.transition="all .7s ease";
+  l.style.opacity="0";
+  document.getElementById("buildEdges").appendChild(l);
+  requestAnimationFrame(()=>{
+    l.setAttribute("x2",x2);l.setAttribute("y2",y2);l.style.opacity="1";
+  });
+}
+
+function animateNext(){
+  if(buildIndex>=buildOrder.length) return;
+  const n=buildOrder[buildIndex++];
+  makeBuildNode(n);
+
+  const edgeMap={
+    2:[[1,2]],3:[[1,3]],5:[[1,5]],
+    6:[[2,6],[3,6]],10:[[2,10],[5,10]],
+    15:[[3,15],[5,15]],30:[[6,30],[10,30],[15,30]]
+  };
+  setTimeout(()=>{
+    (edgeMap[n]||[]).forEach(e=>makeBuildEdge(e[0],e[1]));
+  },350);
+
+  const captions={
+    1:"Step 1: Put 1 at the bottom. It divides every element.",
+    2:"Step 2: Add 2. Connect 1 → 2 because 1 | 2.",
+    3:"Step 3: Add 3. Connect 1 → 3. No 2–3 line: they are incomparable.",
+    5:"Step 4: Add 5. It is also incomparable with 2 and 3.",
+    6:"Step 5: Add 6 above 2 and 3 because 2 | 6 and 3 | 6.",
+    10:"Step 6: Add 10 in the center of the second level, above 2 and 5. Notice 6 and 10 are not connected.",
+    15:"Step 7: Add 15 above 3 and 5. It is incomparable with 6 and 10.",
+    30:"Step 8: Add 30 at the top. It covers 6, 10 and 15."
+  };
+  document.getElementById("buildCaption").innerHTML=`<strong>${captions[n]}</strong>`;
+}
+
+function restartBuild(){
+  if(autoTimer) clearInterval(autoTimer);
+  autoTimer=null; buildIndex=0;
+  document.getElementById("buildNodes").innerHTML="";
+  document.getElementById("buildEdges").innerHTML="";
+  document.getElementById("buildCaption").innerHTML="<strong>Start: place 1 at the bottom because 1 divides every element of D₃₀.</strong>";
+}
+
+function autoBuild(){
+  if(autoTimer) return;
+  if(buildIndex>=buildOrder.length) restartBuild();
+  autoTimer=setInterval(()=>{
+    animateNext();
+    if(buildIndex>=buildOrder.length){
+      clearInterval(autoTimer); autoTimer=null;
+    }
+  },1200);
+}
+
+
+const finalPositions = {
+  1:[450,540], 2:[225,400], 3:[450,400], 5:[675,400],
+  6:[225,250], 10:[450,250], 15:[675,250], 30:[450,90]
+};
+const finalSequence = [
+  {type:"node", n:1, text:"Step 1: Place 1 at the bottom. It divides every element of D₃₀."},
+  {type:"node", n:2, text:"Step 2: Place 2 one level above 1 because 1 | 2."},
+  {type:"edge", a:1,b:2, text:"Draw 1 → 2: this is a cover relation."},
+  {type:"node", n:3, text:"Step 3: Place 3 beside 2. 2 and 3 are incomparable, so there is no line between them."},
+  {type:"edge", a:1,b:3, text:"Draw 1 → 3."},
+  {type:"node", n:5, text:"Step 4: Place 5 on the other side. It is incomparable with 2 and 3."},
+  {type:"edge", a:1,b:5, text:"Draw 1 → 5."},
+  {type:"node", n:6, text:"Step 5: Place 6 above 2 and 3 because 2 | 6 and 3 | 6."},
+  {type:"edge", a:2,b:6, text:"Draw 2 → 6."},
+  {type:"edge", a:3,b:6, text:"Draw 3 → 6."},
+  {type:"node", n:10, text:"Step 6: Place 10 exactly in the center. It is above 2 and 5."},
+  {type:"edge", a:2,b:10, text:"Draw 2 → 10."},
+  {type:"edge", a:5,b:10, text:"Draw 5 → 10."},
+  {type:"node", n:15, text:"Step 7: Place 15 symmetrically opposite 6. It is above 3 and 5."},
+  {type:"edge", a:3,b:15, text:"Draw 3 → 15."},
+  {type:"edge", a:5,b:15, text:"Draw 5 → 15."},
+  {type:"node", n:30, text:"Step 8: Place 30 at the top because 6, 10 and 15 all divide 30."},
+  {type:"edge", a:6,b:30, text:"Draw 6 → 30."},
+  {type:"edge", a:10,b:30, text:"Draw 10 → 30."},
+  {type:"edge", a:15,b:30, text:"Draw 15 → 30."}
+];
+let finalIndex=0, finalTimer=null;
+
+function finalNode(n){
+  const [x,y]=finalPositions[n];
+  const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+  g.setAttribute("class","node");
+  g.setAttribute("transform",`translate(${x},${y}) scale(.05)`);
+  g.style.opacity="0";
+  g.style.transition="transform .6s cubic-bezier(.2,.9,.25,1),opacity .6s";
+  const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  c.setAttribute("r",n===30?29:27);
+  const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+  t.textContent=n;
+  g.appendChild(c);g.appendChild(t);
+  document.getElementById("finalNodes").appendChild(g);
+  requestAnimationFrame(()=>{
+    g.style.opacity="1";
+    g.setAttribute("transform",`translate(${x},${y}) scale(1)`);
+  });
+}
+
+function finalEdge(a,b){
+  const [x1,y1]=finalPositions[a], [x2,y2]=finalPositions[b];
+  const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+  l.setAttribute("class","edge");
+  l.setAttribute("x1",x1);l.setAttribute("y1",y1);
+  l.setAttribute("x2",x1);l.setAttribute("y2",y1);
+  l.style.opacity="0";l.style.transition="all .65s ease";
+  document.getElementById("finalEdges").appendChild(l);
+  requestAnimationFrame(()=>{
+    l.setAttribute("x2",x2);l.setAttribute("y2",y2);l.style.opacity="1";
+  });
+}
+
+function finalNext(){
+  if(finalIndex>=finalSequence.length)return;
+  const q=finalSequence[finalIndex++];
+  if(q.type==="node") finalNode(q.n);
+  else finalEdge(q.a,q.b);
+  document.getElementById("finalCaption").innerHTML="<strong>"+q.text+"</strong>";
+}
+
+function finalRestart(){
+  if(finalTimer)clearInterval(finalTimer);
+  finalTimer=null;finalIndex=0;
+  document.getElementById("finalNodes").innerHTML="";
+  document.getElementById("finalEdges").innerHTML="";
+  document.getElementById("finalCaption").innerHTML="<strong>Step 0: Begin with the empty diagram.</strong>";
+}
+
+function finalAuto(){
+  if(finalTimer)return;
+  if(finalIndex>=finalSequence.length)finalRestart();
+  finalTimer=setInterval(()=>{
+    finalNext();
+    if(finalIndex>=finalSequence.length){
+      clearInterval(finalTimer);finalTimer=null;
+    }
+  },700);
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight") move(1);
+  if(e.key==="ArrowLeft") move(-1);
+});
+render();
+</script>
+</body>
+</html>
